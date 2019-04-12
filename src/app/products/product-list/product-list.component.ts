@@ -25,6 +25,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   // Used to highlight the selected product in the list
   selectedProduct: Product | null;
   sub: Subscription;
+  products$: any;
+  error$: any;
+  errorMessage$: any;
 
   constructor(private productService: ProductService,
     private store: Store<fromProduct.State>) { }
@@ -35,10 +38,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
       selectedProduct => this.selectedProduct = selectedProduct
     );
 
-    this.productService.getProducts().subscribe(
-      (products: Product[]) => this.products = products,
-      (err: any) => this.errorMessage = err.error
-    );
+
+    this.errorMessage$ = this.store.pipe(select(fromProduct.getError)) ;
+    this.store.dispatch(new productActions.Load());
+    this.products$ = this.store.pipe(select(fromProduct.getProducts)) ;
+    // this.productService.getProducts().subscribe(
+    //   (products: Product[]) => this.products = products,
+    //   (err: any) => this.errorMessage = err.error
+    // );
     //without selector
     // this.store.pipe(select('products')).subscribe(
     //   product =>{
