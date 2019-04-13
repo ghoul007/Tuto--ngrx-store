@@ -1,47 +1,21 @@
 import { Product } from "../product";
-import * as fromRoot from '../../state/app.state'
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { ProductActions, ProductActionTypes } from "./product.actions";
-
-export interface State extends fromRoot.State {
-    products: ProductState;
-}
+ 
 
 export interface ProductState {
     showProductCode: boolean;
-    currentProduct: Product;
+    currentProductId: number | null;
     product: Product[];
     error: string;
 }
 const intialStat: ProductState = {
     showProductCode: true,
-    currentProduct: null,
+    currentProductId: null,
     product: [],
     error: ''
 }
-
-const getPtoductFeatureState = createFeatureSelector<ProductState>('products');
-
-export const getShowProductCode = createSelector(
-    getPtoductFeatureState,
-    state => state.showProductCode
-)
-
-export const getCurrentProduct = createSelector(
-    getPtoductFeatureState,
-    state => state.currentProduct
-)
-
-export const getProducts = createSelector(
-    getPtoductFeatureState,
-    state => state.product
-)
-
-export const getError = createSelector(
-    getPtoductFeatureState,
-    state => state.error
-)
-
+ 
 
 export function reducer(state = intialStat, action: ProductActions): ProductState {
     switch (action.type) {
@@ -53,23 +27,17 @@ export function reducer(state = intialStat, action: ProductActions): ProductStat
         case ProductActionTypes.SetCurrentProduct:
             return {
                 ...state,
-                currentProduct: { ...action.payload }
+                currentProductId:  action.payload.id
             }
         case ProductActionTypes.ClearCurrentProduct:
             return {
                 ...state,
-                currentProduct: null
+                currentProductId: null
             }
         case ProductActionTypes.InitializeCurrentProduct:
             return {
                 ...state,
-                currentProduct: {
-                    id: 0,
-                    productName: '',
-                    productCode: 'New',
-                    description: '',
-                    starRating: 0
-                }
+                currentProductId: 0 
             }
 
         case ProductActionTypes.LoadSuccess:
@@ -79,12 +47,31 @@ export function reducer(state = intialStat, action: ProductActions): ProductStat
                 error: ''
             }
 
-            case ProductActionTypes.LoadFail:
+        case ProductActionTypes.LoadFail:
             return {
                 ...state,
                 error: action.payload,
                 product: []
             }
+
+
+            case ProductActionTypes.UpdateProductSuccess:
+            const updatedProducts = state.product.map(
+              item => action.payload.id === item.id ? action.payload : item);
+            return {
+              ...state,
+              product: updatedProducts,
+              currentProductId: action.payload.id,
+              error: ''
+            };
+      
+          case ProductActionTypes.UpdateProductFail:
+            return {
+              ...state,
+              error: action.payload
+            };
+
+
         default:
             return state
     }

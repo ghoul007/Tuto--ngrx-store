@@ -8,8 +8,7 @@ import { ProductService } from '../product.service';
 import { GenericValidator } from '../../shared/generic-validator';
 import { NumberValidators } from '../../shared/number.validator';
 import { Store, select } from '@ngrx/store';
-import * as fromProduct from '../state/product.reducer';
-import { ProductActionTypes } from '../state/product.actions';
+import * as fromProduct from '../state';
 import * as productActions from '../state/product.actions';
 
 
@@ -69,9 +68,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     });
 
     // Watch for changes to the currently selected product
-    this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe(
-      selectedProduct => this.displayProduct(selectedProduct)
-    );
+    // this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe(
+    //   selectedProduct => this.displayProduct(selectedProduct)
+    // );
 
     // Watch for value changes
     this.productForm.valueChanges.subscribe(
@@ -148,10 +147,13 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             (err: any) => this.errorMessage = err.error
           );
         } else {
-          this.productService.updateProduct(p).subscribe(
-            product => this.store.dispatch(new productActions.SetCurrentProduct(product)),
-            (err: any) => this.errorMessage = err.error
-          );
+
+          this.store.dispatch(new productActions.UpdateProduct(p))
+
+          // this.productService.updateProduct(p).subscribe(
+          //   product => this.store.dispatch(new productActions.SetCurrentProduct(product)),
+          //   (err: any) => this.errorMessage = err.error
+          // );
         }
       }
     } else {

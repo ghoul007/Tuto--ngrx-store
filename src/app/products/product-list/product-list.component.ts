@@ -5,10 +5,10 @@ import { Subscription } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 import { Store, select } from '@ngrx/store';
-import * as fromProduct from '../state/product.reducer';
+import * as fromProduct from '../state';
 import { ProductActionTypes } from '../state/product.actions';
 import * as productActions from '../state/product.actions';
-
+import { Observable } from 'rxjs';
 @Component({
   selector: 'pm-product-list',
   templateUrl: './product-list.component.html',
@@ -16,7 +16,7 @@ import * as productActions from '../state/product.actions';
 })
 export class ProductListComponent implements OnInit, OnDestroy {
   pageTitle = 'Products';
-  errorMessage: string;
+  errorMessage: Observable<string>;
 
   displayCode: boolean;
 
@@ -26,8 +26,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
   selectedProduct: Product | null;
   sub: Subscription;
   products$: any;
-  error$: any;
-  errorMessage$: any;
 
   constructor(private productService: ProductService,
     private store: Store<fromProduct.State>) { }
@@ -39,7 +37,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     );
 
 
-    this.errorMessage$ = this.store.pipe(select(fromProduct.getError)) ;
+    this.errorMessage = this.store.pipe(select(fromProduct.getError)) ;
     this.store.dispatch(new productActions.Load());
     this.products$ = this.store.pipe(select(fromProduct.getProducts)) ;
     // this.productService.getProducts().subscribe(
